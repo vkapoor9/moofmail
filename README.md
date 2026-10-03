@@ -121,6 +121,43 @@ cleanup).
 - **An audit log** on your computer records every search, every message opened and
   every change or send.
 
+## Phone and voice access (optional)
+
+By itself the plugin works inside Claude Code on this computer. Phone access lets Claude
+on your phone, including voice mode, and on claude.ai reach the same mail, calendar and
+contacts, still served from your own machine. You need a Mac or Linux machine that stays
+on, a free Cloudflare account, and a domain in it (around $10 a year at Cloudflare
+Registrar, or a free domain). Nothing is hosted by anyone else.
+
+`moofmail-phone setup` builds a Cloudflare Tunnel (outbound only, no ports opened on your
+network) and a Cloudflare Access login in front of it that only your email can pass, with
+the sign-in Claude needs. The server checks Cloudflare's signed token again itself, so a
+change made in the Cloudflare dashboard cannot widen access on its own. Setup then runs a
+self-test and gives you the connector URL only if every check passes: every path refuses
+an unauthenticated request, forged tokens are refused at the edge and by the server, the
+server listens on 127.0.0.1 only, it serves exactly the tools you chose, the login covers
+the whole hostname for exactly one person, and the tunnel token is not visible to other
+programs.
+
+Two profiles. **Read** (the default): read mail, calendar and contacts, and add events
+without inviting anyone. **Write** (opt in): also organize and trash mail (recoverable),
+edit events that have no attendees, and, if you allow sending, send to people you already
+approved or have in Contacts; anyone new needs your confirmation. No attachments over the
+phone path, and daily caps stop runaway actions. Deleting events, cleanup rules,
+unsubscribing by email and resetting approvals are never available there.
+
+The `phone-access` skill walks you through it; ask Claude to "set up phone access". You
+type the Cloudflare token and your app-specific password into hidden prompts in your own
+terminal. They are never read from environment variables and never pasted into the chat.
+The Cloudflare token is used once and not stored; delete it afterwards. Teardown needs a
+fresh one: `moofmail-phone token-url` prints the link again, and you add the one
+permission Cloudflare's link cannot carry (**Account > Cloudflare Tunnel > Edit**) by hand.
+On a server with
+Docker, `--platform docker` writes files for the bundled `docker/docker-compose.yml`
+instead. `moofmail-phone doctor` re-checks everything without a token (`--with-token` adds the
+Access-policy check), `reinstall-services` fixes the
+services after a plugin update, and `teardown` removes only what setup created.
+
 ## Privacy policy
 
 **What it accesses.** Only the iCloud account or accounts you configure: mail
@@ -145,12 +182,25 @@ Two other kinds of connection can happen, both started by you:
   project, if a suitable Python is not already installed) and the plugin's dependencies,
   pinned by `uv.lock`, from the Python Package Index (pypi.org). After that the plugin runs
   from that local copy.
+- **Phone and voice access, only if you set it up.** During setup and teardown,
+  `moofmail-phone` calls the Cloudflare API (api.cloudflare.com) with the token you type,
+  to create or delete the tunnel, DNS record, login rule and Access application in your
+  own Cloudflare account. At runtime, requests from Claude on your phone or claude.ai
+  reach your machine through Cloudflare's network: Cloudflare Access checks who you are,
+  and the tunnel carries the request and the tool's answer. Cloudflare terminates TLS at
+  its edge, so mail content in those answers passes through Cloudflare, under your
+  Cloudflare account's terms. The background services also fetch Cloudflare's public
+  signing keys to verify each request.
 
 **What is stored, and where.** On your own computer only:
 
 - Your app-specific password: in the operating system's secure credential store,
   managed by Claude Code.
 - A list of recipients you approved: `~/.local/state/icloud-mcp/trusted_*.json`.
+- With phone access: the tunnel token and a second copy of your app-specific password
+  in the system keychain (or, on a Linux machine without one, a file only your user can
+  read, `~/.config/moofmail/secrets.json`; for Docker, `secrets.env` beside the compose
+  file), and `~/.config/moofmail/phone.toml`, which holds no secrets.
 - An audit log of actions: `~/.local/state/icloud-mcp/audit.log`. Each line records
   the tool, folder, counts and message numbers, plus search terms, recipient
   addresses and event titles where the action involved them. It never records message
@@ -158,7 +208,8 @@ Two other kinds of connection can happen, both started by you:
 
 **Retention.** These files stay until you delete them. Uninstall the plugin with
 `/plugin`, delete `~/.local/state/icloud-mcp/`, and revoke the app-specific password
-at account.apple.com to remove everything and cut access completely.
+at account.apple.com to remove everything and cut access completely. If you set up phone
+access, run `moofmail-phone teardown --yes` first and remove the connector in claude.ai.
 
 **Children.** Not intended for people under 18.
 

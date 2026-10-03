@@ -13,7 +13,7 @@
 
 [project]
 name = "icloud-mcp"
-version = "1.2.2"
+version = "1.3.0"
 description = "Read, triage and act on iCloud mail, calendar and contacts from Claude."
 readme = "README.md"
 license = { text = "MIT" }
@@ -43,9 +43,15 @@ dependencies = [
 # plain script would break: it is a package module using relative imports, so
 # executing it as __main__ strips the package context and every import fails.
 icloud-mcp = "icloud_mcp.server:main"
+# Phone and voice access: builds the tunnel + Access app in the user's OWN
+# Cloudflare account and runs the two background services. See icloud_mcp/phone/.
+moofmail-phone = "icloud_mcp.phone.cli:main"
 
 [project.optional-dependencies]
 dev = ["pytest==9.1.1"]
+# Linux desktops: store phone-access secrets in the Secret Service. Without it,
+# a headless Linux machine falls back to a 0600 file (and says so).
+phone-linux = ["keyring==25.7.0"]
 
 [build-system]
 requires = ["hatchling"]

@@ -1,0 +1,35 @@
+# Moofmail phone access with Docker Compose.
+#
+# 1. In this folder run:
+#      moofmail-phone --config phone.toml setup --platform docker --email ... --apple-id ...
+#    It builds the tunnel and Access app in YOUR Cloudflare account and writes:
+#      phone.toml   the [remote] block (no secrets)
+#      secrets.env  ICLOUD_APPLE_ID, ICLOUD_APP_PASSWORD, ICLOUD_SEND_ENABLED and
+#                   TUNNEL_TOKEN, readable only by you (mode 600)
+# 2. docker compose up -d --build
+# 3. moofmail-phone --config phone.toml doctor --platform docker
+#
+# Nothing is published on the host network: the server binds 127.0.0.1 inside its
+# container and cloudflared shares that network namespace, dialling out only.
+# Anyone with root on this machine, including a VPS provider, can read secrets.env.
+services:
+  moofmail:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    env_file: secrets.env
+    environment:
+      ICLOUD_MCP_REMOTE_CONFIG: /config/phone.toml
+    volumes:
+      - ./phone.toml:/config/phone.toml:ro
+      - moofmail-state:/srv/moofmail/.local/state
+    restart: unless-stopped
+  tunnel:
+    image: cloudflare/cloudflared:2026.9.3
+    command: tunnel --no-autoupdate run
+    env_file: secrets.env
+    network_mode: "service:moofmail"
+    depends_on: [moofmail]
+    restart: unless-stopped
+volumes:
+  moofmail-state:

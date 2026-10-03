@@ -1,7 +1,7 @@
 {
   "name": "moofmail",
   "displayName": "Moofmail",
-  "version": "1.2.2",
+  "version": "1.3.0",
   "description": "Private iCloud Mail, Calendar and Contacts for Claude. Runs on your own computer, reads without marking mail read, and never sends to a new recipient without your approval.",
   "author": {
     "name": "VK",
