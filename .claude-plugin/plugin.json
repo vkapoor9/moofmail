@@ -1,7 +1,7 @@
 {
   "name": "moofmail",
   "displayName": "Moofmail",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Private iCloud Mail, Calendar and Contacts for Claude. Runs on your own computer, reads without marking mail read, and never sends to a new recipient without your approval.",
   "author": {
     "name": "VK",
@@ -13,6 +13,7 @@
   "supportUrl": "https://github.com/vkapoor9/moofmail/issues",
   "privacyPolicyUrl": "https://github.com/vkapoor9/moofmail#privacy-policy",
   "license": "MIT",
+  "icon": "./.claude-plugin/icon.png",
   "keywords": ["icloud", "email", "imap", "calendar", "caldav", "contacts", "carddav", "inbox", "privacy"],
   "userConfig": {
     "apple_id": {
