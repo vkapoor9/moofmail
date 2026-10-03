@@ -1,0 +1,16 @@
+{
+  "name": "moofmail",
+  "owner": {
+    "name": "VK"
+  },
+  "metadata": {
+    "description": "Moofmail: private iCloud Mail, Calendar and Contacts for Claude Code."
+  },
+  "plugins": [
+    {
+      "name": "moofmail",
+      "source": "./",
+      "description": "Private iCloud Mail, Calendar and Contacts for Claude Code."
+    }
+  ]
+}

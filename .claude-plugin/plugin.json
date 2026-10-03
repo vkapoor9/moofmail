@@ -1,0 +1,51 @@
+{
+  "name": "moofmail",
+  "displayName": "Moofmail",
+  "version": "1.2.0",
+  "description": "Private iCloud Mail, Calendar and Contacts for Claude. Runs on your own computer, reads without marking mail read, and never sends to a new recipient without your approval.",
+  "author": {
+    "name": "VK",
+    "url": "https://github.com/vkapoor9"
+  },
+  "homepage": "https://github.com/vkapoor9/moofmail",
+  "repository": "https://github.com/vkapoor9/moofmail",
+  "documentationUrl": "https://github.com/vkapoor9/moofmail#readme",
+  "supportUrl": "https://github.com/vkapoor9/moofmail/issues",
+  "privacyPolicyUrl": "https://github.com/vkapoor9/moofmail#privacy-policy",
+  "license": "MIT",
+  "keywords": ["icloud", "email", "imap", "calendar", "caldav", "contacts", "carddav", "inbox", "privacy"],
+  "userConfig": {
+    "apple_id": {
+      "type": "string",
+      "title": "Apple Account email",
+      "description": "Your iCloud address, for example you@icloud.com, you@me.com or you@mac.com.",
+      "required": true
+    },
+    "app_password": {
+      "type": "string",
+      "title": "App-specific password",
+      "description": "Generate one at account.apple.com > Sign-In and Security > App-Specific Passwords. It looks like abcd-efgh-ijkl-mnop. This is NOT your Apple Account password.",
+      "sensitive": true,
+      "required": true
+    },
+    "send_enabled": {
+      "type": "boolean",
+      "title": "Allow sending email",
+      "description": "Off by default. When on, the first message to any new recipient (To or Cc) still needs your explicit approval in the conversation.",
+      "default": false
+    },
+    "apple_id_2": {
+      "type": "string",
+      "title": "Second Apple Account email (optional)",
+      "description": "Leave blank unless you also want a second iCloud account.",
+      "default": ""
+    },
+    "app_password_2": {
+      "type": "string",
+      "title": "App-specific password for the second account (optional)",
+      "description": "A separate app-specific password, generated while signed in as the second account.",
+      "sensitive": true,
+      "default": ""
+    }
+  }
+}

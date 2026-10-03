@@ -1,0 +1,76 @@
+# iCloud MCP — non-secret config. Copy to ~/.config/icloud-mcp/config.toml and edit.
+# The app-specific password is NOT here. It lives only in macOS Keychain
+# (service "icloud-mcp"). See README for setup.
+
+[account]
+# iCloud address. IMAP username is derived automatically (part before "@").
+address = "you@me.com"
+
+[scan]
+# Default read window and hard caps (protect against iCloud throttling + token blowup).
+window_days = 7
+max_messages = 200
+# Exclude bulk / mailing-list mail from triage + brief by default.
+exclude_bulk = true
+
+[brief]
+# 8am morning brief. Hour is local, 24h.
+hour = 8
+minute = 0
+# Which folders feed the brief. INBOX only by default.
+folders = ["INBOX"]
+
+[send]
+# Learn-on-approve: first send to a NEW recipient asks for confirmation,
+# then that address is auto-trusted. No pre-set allowlist.
+# Trusted store path (managed by iCloud MCP; do not hand-edit while running).
+trusted_store = "~/.local/state/icloud-mcp/trusted_recipients.json"
+
+[cleanup]
+# Bulk cleanup safety. In v1, rules may archive/move/mark-read but NOT hard-delete
+# unless allow_delete is explicitly true. Dry-run is always the default per call.
+allow_delete = false
+
+# VIP rules: highest match wins. glob on the From address.
+# priority: high | normal | low
+[[triage.rules]]
+match = "boss@example.com"
+priority = "high"
+
+[[triage.rules]]
+match = "*@substack.com"
+priority = "low"
+
+[[triage.rules]]
+match = "receipts@*"
+priority = "low"
+
+# Cleanup rules: applied by apply_rules(). action: archive | move | mark_read | delete
+# (delete only honored when [cleanup].allow_delete = true)
+[[cleanup.rules]]
+match = "*@notifications.example.com"
+action = "archive"
+
+[[cleanup.rules]]
+match = "*newsletter*"
+action = "move"
+folder = "Newsletters"
+
+# ---- Calendar (CalDAV) and Contacts (CardDAV) ----
+# Mail, calendar and contacts do NOT have to live on the same account. If your
+# calendars or address book sit on a second Apple Account, pin them here.
+# Leave `account` unset (or drop the section) to use the default mail account.
+#
+# Getting this wrong fails SILENTLY: search_contacts returns nothing and agenda
+# returns an empty day, both indistinguishable from a correct empty answer.
+# Run status() to see which account each service is actually reading.
+[calendar]
+# Calendars feeding the brief and the default agenda. Empty = every calendar.
+include = ["Home", "Work"]
+account = ""                      # e.g. "work"
+default_write_calendar = "Home"
+# IANA zone name. Leave unset to use this machine's local timezone.
+# timezone = "America/New_York"
+
+[contacts]
+account = ""                      # e.g. "work"

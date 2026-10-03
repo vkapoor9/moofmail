@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "icloud": {
+      "command": "uv",
+      "args": ["run", "--frozen", "--quiet", "--project", "${CLAUDE_PLUGIN_ROOT}", "icloud-mcp"],
+      "env": {
+        "UV_PROJECT_ENVIRONMENT": "${CLAUDE_PLUGIN_DATA}/venv",
+        "ICLOUD_APPLE_ID": "${user_config.apple_id}",
+        "ICLOUD_APP_PASSWORD": "${user_config.app_password}",
+        "ICLOUD_SEND_ENABLED": "${user_config.send_enabled}",
+        "ICLOUD_APPLE_ID_2": "${user_config.apple_id_2}",
+        "ICLOUD_APP_PASSWORD_2": "${user_config.app_password_2}"
+      }
+    }
+  }
+}

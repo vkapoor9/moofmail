@@ -1,0 +1,58 @@
+# Packaging metadata, required for the .mcpb Desktop Extension build.
+#
+# Two things this file fixes at once:
+#   * `server.type: "uv"` in the MCPB manifest REQUIRES a pyproject. It is the
+#     only server type that resolves compiled dependencies (pydantic_core), which
+#     the MCP SDK pulls in and which the "python" type cannot portably bundle.
+#   * It removes the PYTHONPATH wart. Without a pyproject the package was never
+#     installed into the venv, so every registration had to carry PYTHONPATH or
+#     the server imported only when the working directory happened to be here.
+#
+# Where a requirements.txt is present it must match these pins, and these
+# must not drift from it.
+
+[project]
+name = "icloud-mcp"
+version = "1.2.0"
+description = "Read, triage and act on iCloud mail, calendar and contacts from Claude."
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "VK" }]
+keywords = ["mcp", "icloud", "email", "imap", "caldav", "carddav"]
+
+# PINNED DELIBERATELY, and the upper bound is the important half.
+#
+# `mcp` supports 3.10-3.14, but IMAPClient officially supports only through 3.13.
+# 3.13 is the overlap where both projects support you, so it is the safe target
+# for installs. Without the upper bound the MCPB host picks the NEWEST allowed
+# version: a test bundle declaring ">=3.10" was provisioned 3.14.0.
+requires-python = ">=3.13,<3.14"
+
+dependencies = [
+    # 1.x line. v2 went stable 2026-07-28 and RENAMES FastMCP to MCPServer, so a
+    # bare `mcp` would break every import in server.py the day it resolved to v2.
+    "mcp==1.28.1",
+    # 3.0.1 is broken on Python 3.14: IMAP4_TLS.open() assigns to imaplib's `file`,
+    # which became a read-only property. The failure reads as an auth error and
+    # sends you hunting for a credential problem that does not exist.
+    "IMAPClient==3.1.0",
+]
+
+[project.scripts]
+# The MCPB manifest invokes this via `uv run icloud-mcp`. Running server.py as a
+# plain script would break: it is a package module using relative imports, so
+# executing it as __main__ strips the package context and every import fails.
+icloud-mcp = "icloud_mcp.server:main"
+
+[project.optional-dependencies]
+dev = ["pytest==9.1.1"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["icloud_mcp"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
