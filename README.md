@@ -131,8 +131,20 @@ Notes, Photos, Drive, or anything else.
 (`imap.mail.me.com`, `smtp.mail.me.com`, and Apple's CalDAV and CardDAV hosts) over
 TLS. When Claude calls a tool, the result is returned to your Claude Code session, so
 it is processed by Anthropic under your Claude account's terms, like anything else
-you share in a conversation. The plugin sends nothing to its authors or to any other
-third party. There is no analytics or telemetry.
+you share in a conversation. The plugin sends nothing to its authors. There is no
+analytics or telemetry.
+
+Two other kinds of connection can happen, both started by you:
+
+- **One-click unsubscribe.** When you ask Claude to unsubscribe from a mailing list and
+  the message offers a one-click (RFC 8058) link, the plugin sends a single HTTPS POST to
+  that sender's own unsubscribe address, which is a third party chosen by the sender. The
+  request carries only what the sender put in their link. Nothing from your mailbox is
+  added. `find_unsubscribe` shows you the address before anything is sent.
+- **First run.** `uv` downloads a Python runtime (from Astral's `python-build-standalone`
+  project, if a suitable Python is not already installed) and the plugin's dependencies,
+  pinned by `uv.lock`, from the Python Package Index (pypi.org). After that the plugin runs
+  from that local copy.
 
 **What is stored, and where.** On your own computer only:
 
